@@ -17,7 +17,7 @@ import RecurringPage from './pages/RecurringPage';
 import { supabase } from './lib/supabaseClient';
 import * as repo from './lib/repository';
 import { getRate } from './utils/currency';
-import { exportCsv, exportPdf } from './utils/exporters';
+import { exportCsv, exportPdf, type PdfSplitType } from './utils/exporters';
 import { scheduleBrowserReminder } from './utils/notifications';
 
 export interface AppActions {
@@ -31,7 +31,7 @@ export interface AppActions {
   updateProfile: (index: number, name: string) => Promise<void>;
   deleteProfile: (index: number) => Promise<void>;
   updateCurrency: (code: string) => Promise<void>;
-  exportPdf: () => void;
+  exportPdf: (splitType?: PdfSplitType) => void;
   exportCsv: () => Promise<void>;
   logout: () => Promise<void>;
   setBudgets: Dispatch<SetStateAction<Budget[]>>;
@@ -175,7 +175,7 @@ export default function App() {
       await repo.updateCurrency(code);
       setAppData((current) => current ? { ...current, currencyCode: code } : current);
     },
-    exportPdf: () => { if (appData && activeProfile) exportPdf(appData, activeProfile); },
+    exportPdf: (splitType) => { if (appData && activeProfile) exportPdf(appData, activeProfile, splitType); },
     exportCsv: async () => { if (appData && activeProfile) await exportCsv(activeProfile, appData.currencyCode); },
     logout: async () => { await repo.logout(); setAppData(null); setLoggedIn(false); navigate('/login'); },
   }), [refresh, appData, activeProfile, activeIndex, navigate]);
