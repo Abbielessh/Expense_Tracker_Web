@@ -3,10 +3,23 @@ import type { AppActions } from '../App';
 import type { ExpenseAppData, ExpenseProfile, TransactionType } from '../types';
 import { Field, SelectField, TextArea } from '../components/FormFields';
 import CategoryDialog from '../components/CategoryDialog';
+import EasyAddDialog from '../components/EasyAddDialog';
+import type { ParsedTransactionDraft } from '../utils/quickAddParser';
 import * as repo from '../lib/repository';
 import { defaultCategoryObjects, emojiForKey } from '../utils/categoryIcons';
 import { commonCurrencies } from '../utils/currency';
 import { formatDate, parseDateStart } from '../utils/date';
+
+// UUID polyfill — crypto.randomUUID is not available on older iOS Safari
+function generateId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+  });
+}
 
 export default function AddTransactionPage({ appData, activeProfile, actions }: { appData: ExpenseAppData; activeProfile: ExpenseProfile; actions: AppActions }) {
   const [type, setType] = useState<TransactionType>('EXPENSE');
@@ -18,6 +31,7 @@ export default function AddTransactionPage({ appData, activeProfile, actions }: 
   const [note, setNote] = useState('');
   const [showCat, setShowCat] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [showEasyAdd, setShowEasyAdd] = useState(false);
 
   async function addCategory(name: string, iconKey: string) {
     const exists = activeProfile.categories.some((c) => c.toLowerCase() === name.toLowerCase());
@@ -37,7 +51,7 @@ export default function AddTransactionPage({ appData, activeProfile, actions }: 
         if (!current) return current;
         const profiles = [...current.profiles];
         const ix = current.activeProfileIndex;
-        profiles[ix] = { ...profiles[ix], categories: [...profiles[ix].categories, name], categoryObjects: [...profiles[ix].categoryObjects, { id: crypto.randomUUID(), name, iconKey }] };
+        profiles[ix] = { ...profiles[ix], categories: [...profiles[ix].categories, name], categoryObjects: [...profiles[ix].categoryObjects, { id: generateId(), name, iconKey }] };
         return { ...current, profiles };
       });
       setCategory(name);
@@ -51,7 +65,7 @@ export default function AddTransactionPage({ appData, activeProfile, actions }: 
     setSaving(true);
     try {
       await actions.addTransaction({
-        id: crypto.randomUUID(),
+        id: generateId(),
         type,
         title: title.trim() || (type === 'EXPENSE' ? 'Expense' : 'Income'),
         category: type === 'INCOME' ? 'Income' : category,
@@ -64,10 +78,32 @@ export default function AddTransactionPage({ appData, activeProfile, actions }: 
     } finally { setSaving(false); }
   }
 
+  /** Called when user taps "Edit Details" in Easy Add dialog */
+  function handleEditDetails(draft: ParsedTransactionDraft) {
+    setType(draft.type);
+    setTitle(draft.title);
+    setAmount(String(draft.amount));
+    setCategory(draft.category);
+    setBaseCurrency(draft.currency);
+    setDate(draft.date);
+    setNote(draft.note);
+  }
+
   const cats = activeProfile.categoryObjects.length ? activeProfile.categoryObjects : defaultCategoryObjects;
 
   return <div className="screen"><div className="card space-y-4">
-    <h1 className="text-xl font-extrabold">Add Entry</h1>
+    {/* ── Page title row with Easy Add button ── */}
+    <div className="flex items-center justify-between gap-2">
+      <h1 className="text-xl font-extrabold">Add Entry</h1>
+      <button
+        className="easy-add-trigger-btn"
+        onClick={() => setShowEasyAdd(true)}
+        aria-label="Open Easy Add"
+      >
+        ⚡ Easy Add
+      </button>
+    </div>
+
     <div className="grid grid-cols-2 gap-2"><button className={`chip ${type === 'EXPENSE' ? 'chip-active' : ''}`} onClick={() => setType('EXPENSE')}>Expense</button><button className={`chip ${type === 'INCOME' ? 'chip-active' : ''}`} onClick={() => setType('INCOME')}>Income Optional</button></div>
     <Field label={type === 'EXPENSE' ? 'Expense title' : 'Income title'} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Example: Lunch, Salary, Petrol" />
     <Field label="Amount" type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} />
@@ -77,5 +113,17 @@ export default function AddTransactionPage({ appData, activeProfile, actions }: 
     <TextArea label="Note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Optional" />
     <button className="primary-btn w-full" disabled={saving} onClick={submit}>{saving ? 'Saving...' : 'Save Entry'}</button>
     {showCat && <CategoryDialog onClose={() => setShowCat(false)} onAdd={addCategory} />}
+
+    {/* ── Easy Add Dialog ── */}
+    {showEasyAdd && (
+      <EasyAddDialog
+        open={showEasyAdd}
+        onClose={() => setShowEasyAdd(false)}
+        appData={appData}
+        activeProfile={activeProfile}
+        actions={actions}
+        onEditDetails={handleEditDetails}
+      />
+    )}
   </div></div>;
 }

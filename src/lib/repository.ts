@@ -7,6 +7,17 @@ import type {
 import { defaultCategoryObjects, guessIconKeyFromName } from '../utils/categoryIcons';
 import { addDate, advanceToFuture, formatDate, parseDateStart } from '../utils/date';
 
+// UUID polyfill — crypto.randomUUID is not available on older iOS Safari
+function generateId(): string {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = (Math.random() * 16) | 0;
+    return (c === 'x' ? r : (r & 0x3) | 0x8).toString(16);
+  });
+}
+
 const ACTIVE_PROFILE_KEY = 'expense_tracker_active_profile_index';
 
 function throwIfError(error: unknown): asserts error is null {
@@ -26,7 +37,7 @@ async function getUserId(): Promise<string> {
 
 function toTx(dto: TransactionDto): MoneyTransaction {
   return {
-    id: dto.id || crypto.randomUUID(),
+    id: dto.id || generateId(),
     type: dto.type === 'INCOME' ? 'INCOME' : 'EXPENSE',
     title: dto.title,
     category: dto.category,

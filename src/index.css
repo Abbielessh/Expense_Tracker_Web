@@ -55,4 +55,46 @@ button, input, textarea, select { font: inherit; }
   .mobile-safe-bottom {
     padding-bottom: calc(env(safe-area-inset-bottom) + 84px);
   }
+
+  /* ── Easy Add ──────────────────────────────────────────────── */
+  .easy-add-trigger-btn {
+    @apply inline-flex items-center gap-1.5 rounded-2xl border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-bold text-blue-700 shadow-sm transition hover:bg-blue-100 active:scale-[0.98];
+  }
+
+  .easy-add-sheet {
+    @apply w-full max-h-[92vh] overflow-y-auto rounded-t-[28px] bg-white p-5 shadow-2xl space-y-5
+           md:max-w-lg md:rounded-[28px] md:mb-0;
+  }
+
+  .easy-add-header {
+    @apply flex items-start justify-between gap-3;
+  }
+
+  .easy-add-textarea {
+    @apply w-full rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 text-[15px] outline-none transition
+           focus:border-blue-500 focus:ring-4 focus:ring-blue-100 resize-none;
+  }
+
+  .easy-add-chip {
+    @apply rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[12px] font-semibold text-slate-600
+           hover:border-blue-300 hover:bg-blue-50 hover:text-blue-700 transition active:scale-[0.97];
+  }
+
+  .easy-add-confirm-card {
+    @apply rounded-[20px] border border-slate-100 bg-gradient-to-b from-slate-50 to-white p-4 shadow-sm;
+  }
+
+  .easy-add-type-badge {
+    @apply inline-flex items-center rounded-full px-3 py-1 text-[13px] font-bold;
+  }
+  .easy-add-type-badge.expense {
+    @apply bg-red-50 text-red-600;
+  }
+  .easy-add-type-badge.income {
+    @apply bg-emerald-50 text-emerald-700;
+  }
+
+  .easy-add-cat-warning {
+    @apply mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[12px] font-semibold text-amber-700;
+  }
 }
