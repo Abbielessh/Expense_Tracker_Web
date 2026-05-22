@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Cell, Pie, PieChart, ResponsiveContainer } from 'recharts';
 import type { ExpenseProfile } from '../types';
-import { iconForCategory } from '../utils/categoryIcons';
+import { imageForCategory } from '../utils/categoryIconMap';
 import {
   endOfDayMillis,
   formatDate,
@@ -258,7 +258,7 @@ export default function ReportsPage({ profile, currencyCode }: { profile: Expens
               {categoryData.map((cat, i) => {
                 const color = PIE_COLORS[i % PIE_COLORS.length];
                 const pct = totalExpense > 0 ? ((cat.value / totalExpense) * 100).toFixed(1) : '0.0';
-                const emoji = iconForCategory(cat.name);
+                const imgSrc = imageForCategory(cat.name);
                 return (
                   <div
                     key={cat.name}
@@ -278,8 +278,23 @@ export default function ReportsPage({ profile, currencyCode }: { profile: Expens
                         flexShrink: 0,
                       }}
                     />
-                    {/* Emoji */}
-                    <span style={{ fontSize: '15px', flexShrink: 0 }}>{emoji}</span>
+                    {/* Category image icon */}
+                    <span
+                      style={{
+                        width: '22px',
+                        height: '22px',
+                        flexShrink: 0,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                      }}
+                    >
+                      <img
+                        src={imgSrc}
+                        alt={cat.name}
+                        style={{ width: '20px', height: '20px', objectFit: 'contain', display: 'block' }}
+                      />
+                    </span>
                     {/* Category name */}
                     <span
                       style={{

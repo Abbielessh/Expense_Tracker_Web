@@ -4,8 +4,8 @@ import type { ExpenseAppData, ExpenseProfile, RecurringTransaction, TransactionT
 import SummaryMiniCard from '../components/SummaryMiniCard';
 import TransactionCard from '../components/TransactionCard';
 import { formatMoney } from '../utils/money';
-import { iconForCategory } from '../utils/categoryIcons';
-import logoIcon from '../utils/app_logo_expense.png';
+import { imageForCategory } from '../utils/categoryIconMap';
+import logoIcon from '../assets/app_logo_expense.png';
 
 const RECENT_LIMIT = 5;
 
@@ -41,7 +41,7 @@ export default function HomePage({ appData, activeProfile, recurring, actions }:
 
     {upcoming.length > 0 && <div className="card bg-[#FFFBEB]">
       <h2 className="mb-3 text-base font-extrabold text-[#92400E]">🔄 Upcoming Recurring</h2>
-      <div className="space-y-3">{upcoming.map((rec) => <div key={rec.id} className="flex items-center justify-between gap-3"><div className="flex items-center gap-2"><span>{iconForCategory(rec.category)}</span><div><p className="font-bold">{rec.title}</p><p className="text-xs text-[#667085]">{rec.frequency} • {rec.nextDueDate}</p></div></div><p className={`font-extrabold ${rec.type === 'EXPENSE' ? 'text-[#DC2626]' : 'text-[#059669]'}`}>{rec.type === 'EXPENSE' ? '-' : '+'} {formatMoney(rec.amount, appData.currencyCode)}</p></div>)}</div>
+      <div className="space-y-3">{upcoming.map((rec) => <div key={rec.id} className="flex items-center justify-between gap-3"><div className="flex items-center gap-2"><div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F2F4F7] p-1.5"><img src={imageForCategory(rec.category)} alt={rec.category} className="cat-icon-card" /></div><div><p className="font-bold">{rec.title}</p><p className="text-xs text-[#667085]">{rec.frequency} • {rec.nextDueDate}</p></div></div><p className={`font-extrabold ${rec.type === 'EXPENSE' ? 'text-[#DC2626]' : 'text-[#059669]'}`}>{rec.type === 'EXPENSE' ? '-' : '+'} {formatMoney(rec.amount, appData.currencyCode)}</p></div>)}</div>
     </div>}
 
     <section>

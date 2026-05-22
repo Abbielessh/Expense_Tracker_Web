@@ -6,7 +6,8 @@ import CategoryDialog from '../components/CategoryDialog';
 import EasyAddDialog from '../components/EasyAddDialog';
 import type { ParsedTransactionDraft } from '../utils/quickAddParser';
 import * as repo from '../lib/repository';
-import { defaultCategoryObjects, emojiForKey } from '../utils/categoryIcons';
+import { defaultCategoryObjects } from '../utils/categoryIcons';
+import { imageForKey } from '../utils/categoryIconMap';
 import { commonCurrencies } from '../utils/currency';
 import { formatDate, parseDateStart } from '../utils/date';
 
@@ -100,7 +101,7 @@ export default function AddTransactionPage({ appData, activeProfile, actions }: 
         onClick={() => setShowEasyAdd(true)}
         aria-label="Open Easy Add"
       >
-        ⚡ Easy Add
+        Easy Add
       </button>
     </div>
 
@@ -108,7 +109,21 @@ export default function AddTransactionPage({ appData, activeProfile, actions }: 
     <Field label={type === 'EXPENSE' ? 'Expense title' : 'Income title'} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Example: Lunch, Salary, Petrol" />
     <Field label="Amount" type="number" min="0" step="0.01" value={amount} onChange={(e) => setAmount(e.target.value)} />
     <SelectField label="Currency" value={baseCurrency} onChange={(e) => setBaseCurrency(e.target.value)}>{commonCurrencies.map((c) => <option key={c}>{c}</option>)}</SelectField>
-    {type === 'EXPENSE' && <div className="space-y-2"><SelectField label="Category" value={category} onChange={(e) => setCategory(e.target.value)}>{cats.map((c) => <option key={c.name} value={c.name}>{emojiForKey(c.iconKey)} {c.name}</option>)}</SelectField><button className="outline-btn w-full text-[#2563EB]" onClick={() => setShowCat(true)}>+ Add Category</button></div>}
+    {type === 'EXPENSE' && <div className="space-y-2">
+      {/* Category preview icon */}
+      <div className="flex items-center gap-2 mb-1">
+        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#F2F4F7] p-1.5">
+          <img
+            src={imageForKey(cats.find((c) => c.name === category)?.iconKey)}
+            alt={category}
+            className="cat-icon-dropdown"
+          />
+        </div>
+        <span className="text-sm font-semibold text-[#344054]">{category}</span>
+      </div>
+      <SelectField label="Category" value={category} onChange={(e) => setCategory(e.target.value)}>{cats.map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}</SelectField>
+      <button className="outline-btn w-full text-[#2563EB]" onClick={() => setShowCat(true)}>+ Add Category</button>
+    </div>}
     <Field label="Date" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
     <TextArea label="Note" value={note} onChange={(e) => setNote(e.target.value)} placeholder="Optional" />
     <button className="primary-btn w-full" disabled={saving} onClick={submit}>{saving ? 'Saving...' : 'Save Entry'}</button>

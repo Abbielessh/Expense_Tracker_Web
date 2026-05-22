@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { NavLink } from 'react-router-dom';
-import logoIcon from '../utils/app_logo_expense.png';
+import logoIcon from '../assets/app_logo_expense.png';
 import homeIcon from '../utils/ic_nav_home.png';
 import addIcon from '../utils/ic_nav_add.png';
 import reportsIcon from '../utils/ic_nav_reports.png';

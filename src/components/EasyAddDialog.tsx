@@ -3,7 +3,7 @@ import type { AppActions } from '../App';
 import type { Category, ExpenseAppData, ExpenseProfile } from '../types';
 import { parseQuickAdd, formatDisplayDate } from '../utils/quickAddParser';
 import type { ParsedTransactionDraft } from '../utils/quickAddParser';
-import { iconForCategory } from '../utils/categoryIcons';
+import { imageForCategory } from '../utils/categoryIconMap';
 import { formatDate, parseDateStart } from '../utils/date';
 import * as repo from '../lib/repository';
 import { guessIconKeyFromName } from '../utils/categoryIcons';
@@ -371,10 +371,7 @@ export default function EasyAddDialog({
 
               <div className="space-y-2">
                 <Row label="Title" value={draft.title} />
-                <Row
-                  label="Category"
-                  value={`${iconForCategory(draft.category)} ${draft.category}`}
-                />
+                <RowWithIcon label="Category" categoryName={draft.category} />
                 <Row
                   label="Amount"
                   value={`${draft.currency} ${draft.amount.toLocaleString('en-IN', { minimumFractionDigits: draft.amount % 1 !== 0 ? 2 : 0 })}`}
@@ -430,13 +427,27 @@ export default function EasyAddDialog({
   );
 }
 
-// ── Small helper ──────────────────────────────────────────────────────────────
+// ── Small helpers ─────────────────────────────────────────────────────────────
 
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-start justify-between gap-3">
       <span className="flex-none text-[13px] font-semibold text-slate-500 w-20">{label}</span>
       <span className="text-right text-[14px] font-semibold text-[#101828] break-words">{value}</span>
+    </div>
+  );
+}
+
+/** Row variant that renders a PNG category icon next to the category name. */
+function RowWithIcon({ label, categoryName }: { label: string; categoryName: string }) {
+  const src = imageForCategory(categoryName);
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <span className="flex-none text-[13px] font-semibold text-slate-500 w-20">{label}</span>
+      <span className="flex items-center gap-1.5 text-right text-[14px] font-semibold text-[#101828]">
+        <img src={src} alt={categoryName} className="cat-icon-dropdown" />
+        {categoryName}
+      </span>
     </div>
   );
 }

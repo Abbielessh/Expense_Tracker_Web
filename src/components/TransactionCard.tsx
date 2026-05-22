@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { ExpenseProfile, MoneyTransaction, TransactionType } from '../types';
-import { iconForCategory } from '../utils/categoryIcons';
+import { imageForCategory } from '../utils/categoryIconMap';
 import { formatDate, parseDateStart } from '../utils/date';
 import { formatMoney } from '../utils/money';
 import Modal from './Modal';
@@ -18,12 +18,14 @@ export default function TransactionCard({
   const [editing, setEditing] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const isExpense = transaction.type === 'EXPENSE';
-  const categoryIcon = iconForCategory(transaction.category, profile.categoryObjects.find((c) => c.name === transaction.category)?.iconKey);
+  const categoryIconSrc = imageForCategory(transaction.category, profile.categoryObjects.find((c) => c.name === transaction.category)?.iconKey);
 
   return (
     <div className="card-tight">
       <div className="flex items-center gap-3">
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#F2F4F7] text-2xl">{categoryIcon}</div>
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#F2F4F7] p-2">
+            <img src={categoryIconSrc} alt={transaction.category} className="cat-icon-card" />
+          </div>
         <div className="min-w-0 flex-1">
           <p className="truncate text-[17px] font-extrabold text-[#101828]">{transaction.title}</p>
           <p className="mt-0.5 text-[13px] text-[#667085]">{transaction.category} • {formatDate(transaction.dateMillis)}</p>
